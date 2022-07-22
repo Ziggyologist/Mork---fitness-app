@@ -225,6 +225,9 @@ a:visited {
   .form__row {
     display: flex;
     flex-direction: column;
+    margin: 0;
+    padding: 0;
+    width: 100%;
   }
   .form__row--hidden {
     display: none;
@@ -234,5 +237,12 @@ a:visited {
     flex-direction: column;
     height: auto;
     padding-bottom: 3rem;
+    margin: 0;
+    padding: 3px;
+    width: 100%;
+  }
+  .sidebar {
+    padding: 0;
+    width: 50%;
   }
 }
