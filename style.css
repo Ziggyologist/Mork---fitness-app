@@ -1,6 +1,7 @@
 :root {
   --color-brand--1: #30b389;
   --color-brand--2: #beff6b;
+  --color-brand--3: #f05e8e;
 
   --color-dark--1: #1e4e3f;
   --color-dark--2: #2f8066;
@@ -214,16 +215,19 @@ a:visited {
 }
 
 .running-popup .leaflet-popup-content-wrapper {
-  border-left: 5px solid var(--color-brand--2);
+  border-left: 15px solid var(--color-brand--3);
 }
 .cycling-popup .leaflet-popup-content-wrapper {
-  border-left: 5px solid var(--color-brand--1);
+  border-left: 15px solid var(--color-brand--1);
 }
 
 @media only screen and (max-width: 1000px) {
   .form__row {
     display: flex;
     flex-direction: column;
+  }
+  .form__row--hidden {
+    display: none;
   }
   .form {
     display: flex;
