@@ -14,6 +14,7 @@ class Workout {
   date = new Date();
   id = (Date.now() + "").slice(-10);
   //id are usually created using libraries
+  clicks = 0;
 
   constructor(coords, distance, duration) {
     this.coords = coords; //[lat,long]
@@ -26,6 +27,9 @@ class Workout {
     // prettier-ignore
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(
       1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
+  }
+  click() {
+    this.clicks++;
   }
 }
 class Running extends Workout {
@@ -63,13 +67,21 @@ class Cycling extends Workout {
 // APPLICATION ARCHITECTURE
 class App {
   #map;
+  #mapZoomLevel = 13;
   #mapEvent;
   #workouts = [];
   constructor() {
+    // Get user position
     this._getPosition();
+
+    // Get data from Local Storage
+    this._getLocalStorage();
+
+    // Attach event handlers
     form.addEventListener("submit", this._newWorkout.bind(this));
 
     inputType.addEventListener("change", this._toggleElevationField.bind(this));
+    containerWorkouts.addEventListener("click", this._moveToPopUp.bind(this));
   }
   _getPosition() {
     if (navigator.geolocation)
@@ -85,7 +97,7 @@ class App {
     const {longitude} = position.coords;
     console.log(`https://www.google.ro/maps/@${latitude},${longitude}`);
     const coords = [latitude, longitude];
-    this.#map = L.map("map").setView(coords, 13);
+    this.#map = L.map("map").setView(coords, this.#mapZoomLevel);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
@@ -170,6 +182,9 @@ class App {
     // Hide form and input fields
 
     this._hideForm();
+
+    // Set Local Storage to all workouts
+    this._setLocalStorage();
   }
   _renderWorkOutMarker(workout) {
     const myIcon = L.icon({
@@ -190,7 +205,7 @@ class App {
         })
       )
       .setPopupContent(
-        `${workout.name === "running" ? "🏃‍♂️" : "🚴‍♂️"} ${workout.description}`
+        `${workout.type === "running" ? "🏃‍♂️" : "🚴‍♂️"} ${workout.description}`
       )
       .openPopup();
   }
@@ -201,7 +216,7 @@ class App {
           <h2 class="workout__title">${workout.description}</h2>
           <div class="workout__details">
             <span class="workout__icon">${
-              workout.name === "running" ? "🏃‍♂️" : "🚴‍♂️"
+              workout.type === "running" ? "🏃‍♂️" : "🚴‍♂️"
             }</span>
             <span class="workout__value">${workout.distance}</span>
             <span class="workout__unit">km</span>
@@ -242,6 +257,33 @@ class App {
       `;
 
     form.insertAdjacentHTML("afterend", html);
+  }
+
+  _moveToPopUp(e) {
+    const workoutEl = e.target.closest(".workout");
+    if (!workoutEl) return;
+    const workout = this.#workouts.find(
+      work => work.id === workoutEl.dataset.id
+    );
+
+    this.#map.setView(workout.coords, this.#mapZoomLevel + 1, {
+      animate: true,
+      pan: {
+        duration: 1,
+      },
+    });
+
+    //using the public interface
+    workout.click();
+  }
+  _setLocalStorage() {
+    localStorage.setItem("workouts", JSON.stringify(this.#workouts));
+  }
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem("workouts"));
+    if (!data) return;
+    this.#workouts = data;
+    this.#workouts.forEach(workout => this._renderWorkout(workout));
   }
 }
 
