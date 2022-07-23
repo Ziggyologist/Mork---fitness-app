@@ -14,7 +14,7 @@ class Workout {
   date = new Date();
   id = (Date.now() + "").slice(-10);
   //id are usually created using libraries
-  clicks = 0;
+  // clicks = 0;
 
   constructor(coords, distance, duration) {
     this.coords = coords; //[lat,long]
@@ -28,9 +28,9 @@ class Workout {
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(
       1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
   }
-  click() {
-    this.clicks++;
-  }
+  // click() {
+  //   this.clicks++;
+  // }
 }
 class Running extends Workout {
   type = "running";
@@ -106,6 +106,7 @@ class App {
 
     // Handling clicks on maps
     this.#map.on("click", this._showForm.bind(this));
+    this.#workouts.forEach(workout => this._renderWorkOutMarker(workout));
   }
   _showForm(mapE) {
     this.#mapEvent = mapE;
@@ -274,7 +275,7 @@ class App {
     });
 
     //using the public interface
-    workout.click();
+    // workout.click();
   }
   _setLocalStorage() {
     localStorage.setItem("workouts", JSON.stringify(this.#workouts));
@@ -284,6 +285,11 @@ class App {
     if (!data) return;
     this.#workouts = data;
     this.#workouts.forEach(workout => this._renderWorkout(workout));
+  }
+
+  reset() {
+    localStorage.removeItem("workouts");
+    location.reload();
   }
 }
 
